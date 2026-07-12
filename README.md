@@ -1,44 +1,53 @@
 # Aamer Javed – Data Science Portfolio
 
-This repository is the central hub for my data science, machine learning, forecasting, analytics, and applied AI portfolio.
+This repository is the central hub for my data science, simulation, optimization, forecasting, analytics, and applied AI portfolio.
 
-I am a Data Scientist and Analytics Engineer with 11+ years of experience across BI, data platforms, operations analytics, cloud analytics, and machine learning. My portfolio focuses on projects that connect technical modeling with business decisions.
+My current portfolio direction is focused on **robotic warehouse simulation and optimization**: discrete-event simulation, multi-agent robot fleet behavior, warehouse digital twins, task allocation, routing, scheduling, simulation calibration, and operational decision support.
 
 ## Portfolio Theme
 
-My portfolio is built around one practical idea:
+> Build practical simulation and optimization systems that translate real-world warehouse operations into measurable, testable, and explainable decision models.
 
-> Data science is most valuable when models are tied to business context, measurable outcomes, and operational decisions.
+## Featured Projects: Robotic Warehouse Simulation & Optimization
 
-## Featured Projects
-
-| Project | Area | Status | Repository |
+| Project | Area | Status | Location |
 |---|---|---|---|
-| Snowflake Cost Forecasting | Forecasting / FinOps | Active | [snowflake-cost-forecasting](https://github.com/aamer-javed/snowflake-cost-forecasting) |
-| Operations KPI Anomaly Detection | Anomaly Detection / Operations Analytics | Active | [operations-kpi-anomaly-detection](https://github.com/aamer-javed/operations-kpi-anomaly-detection) |
-| House Price Prediction ML | Regression / Feature Engineering | In Progress | [house-price-prediction-ml](https://github.com/aamer-javed/house-price-prediction-ml) |
-| Customer Churn Prediction | Classification / Business ML | In Progress | [customer-churn-prediction](https://github.com/aamer-javed/customer-churn-prediction) |
-| Kaggle Competition Work | Applied ML | In Progress | [Kaggle Profile](https://www.kaggle.com/aamerjavedmce) |
+| Robotic Warehouse DES Simulation | SimPy / DES / Queueing | Scaffolded | [projects/robotic-warehouse-simpy-simulation](projects/robotic-warehouse-simpy-simulation) |
+| Multi-Agent Robot Fleet Optimization | Routing / Assignment / Fleet Ops | Planned | [projects/multi-agent-robot-fleet-optimization](projects/multi-agent-robot-fleet-optimization) |
+| Warehouse Digital Twin Scenario Planner | Digital Twin / Scenario Testing | Planned | [projects/warehouse-digital-twin-scenario-planner](projects/warehouse-digital-twin-scenario-planner) |
+| Order Picking & Routing Optimization | OR-Tools / MIP / Heuristics | Planned | [projects/order-picking-batching-routing-optimization](projects/order-picking-batching-routing-optimization) |
+| Simulation Calibration with ML | Statistics / ML / Validation | Planned | [projects/simulation-calibration-ml](projects/simulation-calibration-ml) |
+| RL Warehouse Dispatching Agent | Reinforcement Learning | Planned | [projects/warehouse-rl-dispatching-agent](projects/warehouse-rl-dispatching-agent) |
+
+## Existing Applied Data Science Projects
+
+| Project | Area | Repository |
+|---|---|---|
+| Snowflake Cost Forecasting | Forecasting / FinOps | [snowflake-cost-forecasting](https://github.com/aamer-javed/snowflake-cost-forecasting) |
+| Operations KPI Anomaly Detection | Anomaly Detection / Operations Analytics | [operations-kpi-anomaly-detection](https://github.com/aamer-javed/operations-kpi-anomaly-detection) |
+| House Price Prediction ML | Regression / Feature Engineering | [house-price-prediction-ml](https://github.com/aamer-javed/house-price-prediction-ml) |
+| Customer Churn Prediction | Classification / Business ML | [customer-churn-prediction](https://github.com/aamer-javed/customer-churn-prediction) |
+| Kaggle Competition Work | Applied ML | [Kaggle Profile](https://www.kaggle.com/aamerjavedmce) |
 
 ## Project Standards
 
 Each completed project should include:
 
-- Business problem and objective
+- Business or operational problem statement
+- Simulation/modeling objective
 - Dataset description and assumptions
-- Exploratory data analysis
-- Data cleaning and preprocessing
-- Feature engineering
-- Baseline model
-- Model comparison
+- Baseline method
+- Experiment design
 - Evaluation metrics
+- Bottleneck analysis
 - Business interpretation
+- Reproducible code
 - Limitations and next steps
 
 ## Repository Structure Standard
 
 ```text
-project-name/
+projects/project-name/
 ├── README.md
 ├── notebooks/
 ├── src/
@@ -53,45 +62,52 @@ project-name/
 ## Technical Skills Demonstrated
 
 **Programming & Data:** Python, SQL, pandas, NumPy  
-**Machine Learning:** scikit-learn, regression, classification, model evaluation, feature engineering  
-**Forecasting:** lag features, rolling windows, trend analysis, baseline forecasting, ML regression  
-**Anomaly Detection:** rule-based detection, Isolation Forest, severity scoring, operational triage  
+**Simulation:** SimPy, discrete-event simulation, queueing behavior, stochastic processes  
+**Optimization:** OR-Tools, LP/MIP concepts, routing, task assignment, heuristics, scenario search  
+**Machine Learning:** forecasting, anomaly detection, regression, classification, calibration, validation  
 **Analytics & BI:** Tableau, KPI design, dashboards, executive reporting, data storytelling  
-**Data Platforms:** Snowflake, PostgreSQL, Azure, cloud data workflows  
-**Advanced Learning Areas:** deep learning, neural networks, Snowflake Cortex, Snowpark, agentic AI, MLOps
+**Data Platforms:** Snowflake, PostgreSQL, Databricks-ready patterns, cloud data workflows  
+**Advanced Learning Areas:** digital twins, multi-agent systems, reinforcement learning, MLOps
 
-## Portfolio Roadmap
+## Build Roadmap
 
-### Phase 1 – Core Applied ML
+### Phase 1 – Simulation Foundation
 
-- Snowflake-style cost forecasting
-- Operations KPI anomaly detection
-- House price regression
-- Customer churn classification
+- SimPy warehouse event loop
+- Order arrivals and service-time distributions
+- Robot fleet resources and station queues
+- Throughput, wait-time, utilization, and bottleneck KPIs
 
-### Phase 2 – Advanced ML and AI
+### Phase 2 – Fleet Optimization
 
-- Deep learning and neural network fundamentals
-- LLM-powered analytics assistant
-- Agentic AI workflow for data quality and SQL analysis
-- Snowflake Cortex and Snowpark ML experiments
+- Routing using grid-world paths
+- Task assignment using heuristic and optimization baselines
+- Congestion-aware dispatching
+- Fleet-size and station-capacity sensitivity analysis
 
-### Phase 3 – Production-Ready DS
+### Phase 3 – Digital Twin and Scenario Planning
 
-- Reproducible pipelines
-- Model monitoring concepts
-- Simple APIs or Streamlit apps
-- Documentation for business users
+- What-if scenario runner
+- Streamlit or Tableau dashboard
+- Capacity planning recommendations
+- Executive summary outputs
+
+### Phase 4 – Calibration and Advanced Decisioning
+
+- Fit distributions from operational data
+- Compare simulated vs observed KPI behavior
+- Add reinforcement learning dispatching baseline
+- Document validation and reproducibility methods
 
 ## Why These Projects
 
-These projects are selected to show a balanced data science skill set:
+These projects are selected to match senior/principal data science work in robotic warehouse systems:
 
-- **Forecasting** shows time-aware modeling and planning ability.
-- **Anomaly detection** shows operational monitoring and prioritization.
-- **Regression** shows feature engineering and numeric prediction.
-- **Classification** shows supervised learning and business decision support.
-- **AI/agentic workflows** show forward-looking skills in analytics automation.
+- **Simulation** shows ability to model complex stochastic operations.
+- **Optimization** shows ability to improve throughput, latency, and resource utilization.
+- **Digital twins** show scenario testing and capacity planning ability.
+- **Calibration** shows model validation and real-world realism.
+- **Visualization** shows ability to communicate recommendations to technical and executive stakeholders.
 
 ## Connect
 
