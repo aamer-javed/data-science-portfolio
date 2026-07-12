@@ -1,13 +1,16 @@
-"""Typed entities used by the simulation."""
+"""Typed records produced by the warehouse simulation."""
 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from typing import Any
+
+import pandas as pd
 
 
 @dataclass(frozen=True)
 class Order:
-    """An order/task entering the warehouse simulation."""
+    """An inbound warehouse task/order waiting for robot assignment."""
 
     order_id: int
     created_at: float
@@ -15,7 +18,12 @@ class Order:
 
 @dataclass(frozen=True)
 class OrderRecord:
-    """Completed order-level event record."""
+    """Completed order-level event record.
+
+    This is intentionally wide enough to support debugging, KPI aggregation,
+    statistical calibration, and downstream visualization without re-running the
+    event simulation.
+    """
 
     scenario_id: str
     replication: int
@@ -33,14 +41,15 @@ class OrderRecord:
     charge_time_minutes: float
     cycle_time_minutes: float
     met_sla: bool
+    robot_failed: bool
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
 @dataclass(frozen=True)
 class MonitorRecord:
-    """Time-series record used for queue and station monitoring."""
+    """Periodic monitoring snapshot for queue and station state."""
 
     scenario_id: str
     replication: int
@@ -50,5 +59,14 @@ class MonitorRecord:
     station_users: int
     completed_orders: int
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class SimulationOutputs:
+    """Structured output returned by a single simulation run."""
+
+    orders: pd.DataFrame
+    monitors: pd.DataFrame
+    summary: dict[str, Any]
