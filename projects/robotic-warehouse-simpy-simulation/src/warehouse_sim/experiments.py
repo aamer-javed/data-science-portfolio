@@ -4,8 +4,9 @@ Running this module regenerates the committed CSV outputs and SVG figures:
 
     python -m warehouse_sim.experiments
 
-The experiment suite is deliberately deterministic. Each scenario has its own
-seed so results are reproducible and reviewable in a pull request.
+The experiment suite is deterministic. Each scenario has its own seed and each
+replication uses an offset seed, so results are reproducible and reviewable in a
+pull request.
 """
 
 from __future__ import annotations
@@ -107,6 +108,7 @@ def save_line_chart(
     y_label: str,
     output_path: Path,
 ) -> None:
+    """Save a clean line chart for one scenario experiment."""
     fig, ax = plt.subplots(figsize=(10, 5.5))
     for y_col in y_cols:
         ax.plot(frame[x_col], frame[y_col], marker="o", label=y_col.replace("_", " "))
@@ -130,6 +132,7 @@ def save_bar_chart(
     y_label: str,
     output_path: Path,
 ) -> None:
+    """Save a clean bar chart for scenario ranking."""
     fig, ax = plt.subplots(figsize=(10, 5.5))
     ax.bar(frame[x_col], frame[y_col])
     ax.set_title(title)
@@ -143,6 +146,7 @@ def save_bar_chart(
 
 
 def save_queue_chart(monitors: pd.DataFrame, output_path: Path) -> None:
+    """Save a queue time-series chart for baseline vs stress behavior."""
     selected = monitors[monitors["scenario_id"].isin(["baseline", "demand_plus_50pct"])]
     fig, ax = plt.subplots(figsize=(10, 5.5))
     for scenario_id, group in selected.groupby("scenario_id"):
@@ -158,19 +162,19 @@ def save_queue_chart(monitors: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
-def run_experiment_suite(output_dir: Path = REPORTS_DIR) -> dict[str, pd.DataFrame]:
+def run_experiment_suite(output_dir: Path = REPORTS_DIR, replications: int = 5) -> dict[str, pd.DataFrame]:
     """Run the standard experiment suite and write outputs to disk."""
     figures_dir = output_dir / "figures"
     output_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    orders, monitors, scenario_summary_raw = run_scenarios(replication_configs(scenario_catalog(), 5))
+    orders, monitors, scenario_summary_raw = run_scenarios(replication_configs(scenario_catalog(), replications))
     scenario_summary = aggregate_replications(scenario_summary_raw)
 
-    _, _, fleet_raw = run_scenarios(replication_configs(fleet_size_configs(), 5))
+    _, _, fleet_raw = run_scenarios(replication_configs(fleet_size_configs(), replications))
     fleet_summary = aggregate_replications(fleet_raw).sort_values("robot_count")
 
-    _, _, demand_raw = run_scenarios(replication_configs(demand_stress_configs(), 5))
+    _, _, demand_raw = run_scenarios(replication_configs(demand_stress_configs(), replications))
     demand_summary = aggregate_replications(demand_raw).sort_values("arrival_rate_per_minute")
 
     orders.to_csv(output_dir / "order_level_results.csv", index=False)
