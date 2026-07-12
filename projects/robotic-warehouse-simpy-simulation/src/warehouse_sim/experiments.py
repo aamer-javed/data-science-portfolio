@@ -191,22 +191,22 @@ def synthetic_historical_kpis(scenario_summary: pd.DataFrame) -> pd.DataFrame:
     return baseline
 
 
-def run_experiment_suite(output_dir: Path = REPORTS_DIR) -> dict[str, pd.DataFrame]:
+def run_experiment_suite(output_dir: Path = REPORTS_DIR, replications: int = 5) -> dict[str, pd.DataFrame]:
     """Run the standard experiment suite and write outputs to disk."""
     figures_dir = output_dir / "figures"
     output_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    orders, monitors, scenario_summary_raw = run_scenarios(replication_configs(scenario_catalog(), 5))
+    orders, monitors, scenario_summary_raw = run_scenarios(replication_configs(scenario_catalog(), replications))
     scenario_summary = aggregate_replications(scenario_summary_raw)
 
-    _, _, fleet_raw = run_scenarios(replication_configs(fleet_size_configs(), 5))
+    _, _, fleet_raw = run_scenarios(replication_configs(fleet_size_configs(), replications))
     fleet_summary = aggregate_replications(fleet_raw).sort_values("robot_count")
 
-    _, _, demand_raw = run_scenarios(replication_configs(demand_stress_configs(), 5))
+    _, _, demand_raw = run_scenarios(replication_configs(demand_stress_configs(), replications))
     demand_summary = aggregate_replications(demand_raw).sort_values("arrival_rate_per_minute")
 
-    _, _, policy_raw = run_scenarios(replication_configs(dispatch_policy_configs(), 5))
+    _, _, policy_raw = run_scenarios(replication_configs(dispatch_policy_configs(), replications))
     policy_summary = aggregate_replications(policy_raw).sort_values("avg_cycle_time_minutes")
 
     historical_kpis = synthetic_historical_kpis(scenario_summary)
@@ -221,42 +221,10 @@ def run_experiment_suite(output_dir: Path = REPORTS_DIR) -> dict[str, pd.DataFra
     historical_kpis.to_csv(output_dir / "synthetic_historical_kpis.csv", index=False)
     validation_error.to_csv(output_dir / "historical_kpi_validation_error.csv", index=False)
 
-    save_line_chart(
-        fleet_summary,
-        x_col="robot_count",
-        y_cols=["throughput_per_hour"],
-        title="Throughput improves then plateaus as fleet size grows",
-        x_label="Robot fleet size",
-        y_label="Completed orders per hour",
-        output_path=figures_dir / "throughput_by_fleet_size.svg",
-    )
-    save_line_chart(
-        demand_summary,
-        x_col="arrival_rate_per_minute",
-        y_cols=["avg_cycle_time_minutes", "p90_cycle_time_minutes"],
-        title="Cycle time rises nonlinearly as demand approaches capacity",
-        x_label="Order arrival rate per minute",
-        y_label="Cycle time minutes",
-        output_path=figures_dir / "cycle_time_by_demand.svg",
-    )
-    save_bar_chart(
-        scenario_summary.sort_values("sla_attainment_rate", ascending=False),
-        x_col="scenario_id",
-        y_col="sla_attainment_rate",
-        title="SLA attainment by operating scenario",
-        x_label="Scenario",
-        y_label="Share of completed orders meeting SLA",
-        output_path=figures_dir / "sla_attainment_by_scenario.svg",
-    )
-    save_bar_chart(
-        policy_summary,
-        x_col="scenario_id",
-        y_col="avg_cycle_time_minutes",
-        title="Dispatching policy comparison by average cycle time",
-        x_label="Assignment policy scenario",
-        y_label="Average cycle time minutes",
-        output_path=figures_dir / "dispatch_policy_comparison.svg",
-    )
+    save_line_chart(fleet_summary, "robot_count", ["throughput_per_hour"], "Throughput improves then plateaus as fleet size grows", "Robot fleet size", "Completed orders per hour", figures_dir / "throughput_by_fleet_size.svg")
+    save_line_chart(demand_summary, "arrival_rate_per_minute", ["avg_cycle_time_minutes", "p90_cycle_time_minutes"], "Cycle time rises nonlinearly as demand approaches capacity", "Order arrival rate per minute", "Cycle time minutes", figures_dir / "cycle_time_by_demand.svg")
+    save_bar_chart(scenario_summary.sort_values("sla_attainment_rate", ascending=False), "scenario_id", "sla_attainment_rate", "SLA attainment by operating scenario", "Scenario", "Share of completed orders meeting SLA", figures_dir / "sla_attainment_by_scenario.svg")
+    save_bar_chart(policy_summary, "scenario_id", "avg_cycle_time_minutes", "Dispatching policy comparison by average cycle time", "Assignment policy scenario", "Average cycle time minutes", figures_dir / "dispatch_policy_comparison.svg")
     save_queue_chart(monitors, figures_dir / "queue_length_time_series.svg")
 
     return {
