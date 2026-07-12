@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "robotic-warehouse-simpy-simulation"
-version = "0.2.0"
-description = "Discrete-event simulation and experiment framework for robotic warehouse capacity analysis."
+version = "0.3.0"
+description = "Discrete-event simulation and digital twin framework for robotic warehouse capacity analysis."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -13,6 +13,7 @@ dependencies = [
     "numpy>=1.26.0",
     "pandas>=2.2.0",
     "matplotlib>=3.8.0",
+    "streamlit>=1.36.0",
 ]
 
 [tool.setuptools.package-dir]
