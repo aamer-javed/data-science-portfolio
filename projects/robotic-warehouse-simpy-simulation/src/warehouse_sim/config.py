@@ -1,4 +1,9 @@
-"""Configuration objects for the robotic warehouse simulation."""
+"""Configuration objects for the robotic warehouse simulation.
+
+The values in this public portfolio project are synthetic. They are selected to
+make operational trade-offs visible without representing a proprietary warehouse
+layout, private throughput target, or employer-specific system behavior.
+"""
 
 from __future__ import annotations
 
@@ -8,12 +13,17 @@ from typing import Any
 
 @dataclass(frozen=True)
 class WarehouseConfig:
-    """Simulation configuration for one scenario.
+    """Simulation configuration for one scenario and replication.
 
-    Times are expressed in minutes. Arrival rate is orders per minute.
+    Units:
+    - All times are minutes.
+    - Order arrival rate is orders per minute.
+    - Utilization values are calculated over the configured simulation horizon.
     """
 
-    sim_minutes: int = 480
+    scenario_id: str = "baseline"
+    replication: int = 0
+    sim_minutes: int = 8 * 60
     robot_count: int = 24
     station_count: int = 4
     order_arrival_rate_per_minute: float = 0.85
@@ -29,6 +39,8 @@ class WarehouseConfig:
     seed: int = 42
 
     def __post_init__(self) -> None:
+        if not self.scenario_id:
+            raise ValueError("scenario_id must be populated.")
         if self.sim_minutes <= 0:
             raise ValueError("sim_minutes must be positive.")
         if self.robot_count <= 0:
@@ -37,16 +49,28 @@ class WarehouseConfig:
             raise ValueError("station_count must be positive.")
         if self.order_arrival_rate_per_minute <= 0:
             raise ValueError("order_arrival_rate_per_minute must be positive.")
+        if self.mean_travel_time_minutes < 0:
+            raise ValueError("mean_travel_time_minutes cannot be negative.")
+        if self.mean_pick_time_minutes < 0:
+            raise ValueError("mean_pick_time_minutes cannot be negative.")
+        if self.mean_dropoff_time_minutes < 0:
+            raise ValueError("mean_dropoff_time_minutes cannot be negative.")
         if not 0 <= self.failure_probability_per_task <= 1:
             raise ValueError("failure_probability_per_task must be between 0 and 1.")
+        if self.mean_repair_time_minutes < 0:
+            raise ValueError("mean_repair_time_minutes cannot be negative.")
         if self.charge_after_tasks <= 0:
             raise ValueError("charge_after_tasks must be positive.")
+        if self.mean_charge_time_minutes < 0:
+            raise ValueError("mean_charge_time_minutes cannot be negative.")
+        if self.sla_minutes <= 0:
+            raise ValueError("sla_minutes must be positive.")
         if self.monitor_interval_minutes <= 0:
             raise ValueError("monitor_interval_minutes must be positive.")
 
     @classmethod
     def from_dict(cls, values: dict[str, Any]) -> "WarehouseConfig":
-        """Create a config from a dictionary, ignoring unknown keys."""
+        """Create a config from a dictionary while ignoring unknown keys."""
         allowed = set(cls.__dataclass_fields__.keys())
         return cls(**{key: value for key, value in values.items() if key in allowed})
 
