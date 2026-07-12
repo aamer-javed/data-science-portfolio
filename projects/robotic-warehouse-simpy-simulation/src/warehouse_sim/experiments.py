@@ -4,9 +4,8 @@ Running this module regenerates the committed CSV outputs and SVG figures:
 
     python -m warehouse_sim.experiments
 
-The experiment suite is deterministic. Each scenario has its own seed and each
-replication uses an offset seed, so results are reproducible and reviewable in a
-pull request.
+The experiment suite is deterministic. Each scenario has its own seed so results
+are reproducible and reviewable in a pull request.
 """
 
 from __future__ import annotations
@@ -17,6 +16,7 @@ from typing import Iterable
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from warehouse_sim.calibration import compare_to_historical_kpis
 from warehouse_sim.config import WarehouseConfig
 from warehouse_sim.simulation import run_scenarios, scenario_catalog
 
@@ -29,7 +29,9 @@ SUMMARY_COLUMNS = [
     "replications",
     "robot_count",
     "station_count",
+    "charging_station_count",
     "arrival_rate_per_minute",
+    "assignment_policy",
     "generated_orders",
     "completed_orders",
     "orders_left_in_queue",
@@ -39,9 +41,13 @@ SUMMARY_COLUMNS = [
     "p90_cycle_time_minutes",
     "avg_queue_wait_minutes",
     "avg_station_wait_minutes",
+    "avg_charging_wait_minutes",
+    "avg_travel_distance_cells",
     "robot_utilization",
     "station_utilization",
+    "charger_utilization",
     "sla_attainment_rate",
+    "priority_sla_attainment_rate",
     "failure_rate",
     "charge_time_total_minutes",
     "bottleneck_classification",
@@ -71,10 +77,23 @@ def demand_stress_configs() -> list[WarehouseConfig]:
     ]
 
 
-def replication_configs(
-    configs: Iterable[WarehouseConfig], replications: int = 5
-) -> list[WarehouseConfig]:
-    """Expand scenarios across replications for more stable summary statistics."""
+def dispatch_policy_configs() -> list[WarehouseConfig]:
+    """Compare transparent task assignment rules under the same demand pattern."""
+    base = WarehouseConfig(order_arrival_rate_per_minute=1.05, seed=300)
+    return [
+        base.with_overrides(scenario_id="policy_fifo", assignment_policy="fifo", seed=301),
+        base.with_overrides(scenario_id="policy_priority_fifo", assignment_policy="priority_fifo", seed=302),
+        base.with_overrides(scenario_id="policy_nearest_robot", assignment_policy="nearest_robot", seed=303),
+        base.with_overrides(
+            scenario_id="policy_shortest_queue_priority",
+            assignment_policy="shortest_queue_priority",
+            seed=304,
+        ),
+    ]
+
+
+def replication_configs(configs: Iterable[WarehouseConfig], replications: int = 5) -> list[WarehouseConfig]:
+    """Expand scenarios across replications for stable summary statistics."""
     expanded: list[WarehouseConfig] = []
     for config in configs:
         for replication in range(replications):
@@ -94,9 +113,10 @@ def aggregate_replications(summary: pd.DataFrame) -> pd.DataFrame:
         .agg(lambda values: values.mode().iloc[0] if not values.mode().empty else values.iloc[0])
         .reset_index()
     )
+    policies = summary.groupby("scenario_id")["assignment_policy"].first().reset_index()
     return grouped.merge(replications, on="scenario_id", how="left").merge(
         bottlenecks, on="scenario_id", how="left"
-    )
+    ).merge(policies, on="scenario_id", how="left")
 
 
 def save_line_chart(
@@ -108,7 +128,6 @@ def save_line_chart(
     y_label: str,
     output_path: Path,
 ) -> None:
-    """Save a clean line chart for one scenario experiment."""
     fig, ax = plt.subplots(figsize=(10, 5.5))
     for y_col in y_cols:
         ax.plot(frame[x_col], frame[y_col], marker="o", label=y_col.replace("_", " "))
@@ -132,7 +151,6 @@ def save_bar_chart(
     y_label: str,
     output_path: Path,
 ) -> None:
-    """Save a clean bar chart for scenario ranking."""
     fig, ax = plt.subplots(figsize=(10, 5.5))
     ax.bar(frame[x_col], frame[y_col])
     ax.set_title(title)
@@ -146,13 +164,12 @@ def save_bar_chart(
 
 
 def save_queue_chart(monitors: pd.DataFrame, output_path: Path) -> None:
-    """Save a queue time-series chart for baseline vs stress behavior."""
-    selected = monitors[monitors["scenario_id"].isin(["baseline", "demand_plus_50pct"])]
+    selected = monitors[monitors["scenario_id"].isin(["baseline", "demand_plus_50pct", "charger_constrained"])]
     fig, ax = plt.subplots(figsize=(10, 5.5))
     for scenario_id, group in selected.groupby("scenario_id"):
         queue_by_time = group.groupby("timestamp_minutes", as_index=False)["queue_length"].mean()
         ax.plot(queue_by_time["timestamp_minutes"], queue_by_time["queue_length"], label=scenario_id)
-    ax.set_title("Queue growth exposes demand stress before throughput fails")
+    ax.set_title("Queue growth exposes stress before throughput collapses")
     ax.set_xlabel("Simulation minute")
     ax.set_ylabel("Average order queue length")
     ax.grid(True, alpha=0.25)
@@ -162,26 +179,47 @@ def save_queue_chart(monitors: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
-def run_experiment_suite(output_dir: Path = REPORTS_DIR, replications: int = 5) -> dict[str, pd.DataFrame]:
+def synthetic_historical_kpis(scenario_summary: pd.DataFrame) -> pd.DataFrame:
+    """Create public-safe KPI targets used to demonstrate validation workflow."""
+    baseline = scenario_summary[scenario_summary["scenario_id"] == "baseline"].copy()
+    if baseline.empty:
+        return pd.DataFrame(columns=["scenario_id", "throughput_per_hour", "avg_cycle_time_minutes", "sla_attainment_rate"])
+    baseline = baseline[["scenario_id", "throughput_per_hour", "avg_cycle_time_minutes", "sla_attainment_rate"]]
+    baseline["throughput_per_hour"] *= 0.98
+    baseline["avg_cycle_time_minutes"] *= 1.05
+    baseline["sla_attainment_rate"] *= 0.99
+    return baseline
+
+
+def run_experiment_suite(output_dir: Path = REPORTS_DIR) -> dict[str, pd.DataFrame]:
     """Run the standard experiment suite and write outputs to disk."""
     figures_dir = output_dir / "figures"
     output_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    orders, monitors, scenario_summary_raw = run_scenarios(replication_configs(scenario_catalog(), replications))
+    orders, monitors, scenario_summary_raw = run_scenarios(replication_configs(scenario_catalog(), 5))
     scenario_summary = aggregate_replications(scenario_summary_raw)
 
-    _, _, fleet_raw = run_scenarios(replication_configs(fleet_size_configs(), replications))
+    _, _, fleet_raw = run_scenarios(replication_configs(fleet_size_configs(), 5))
     fleet_summary = aggregate_replications(fleet_raw).sort_values("robot_count")
 
-    _, _, demand_raw = run_scenarios(replication_configs(demand_stress_configs(), replications))
+    _, _, demand_raw = run_scenarios(replication_configs(demand_stress_configs(), 5))
     demand_summary = aggregate_replications(demand_raw).sort_values("arrival_rate_per_minute")
+
+    _, _, policy_raw = run_scenarios(replication_configs(dispatch_policy_configs(), 5))
+    policy_summary = aggregate_replications(policy_raw).sort_values("avg_cycle_time_minutes")
+
+    historical_kpis = synthetic_historical_kpis(scenario_summary)
+    validation_error = compare_to_historical_kpis(scenario_summary, historical_kpis)
 
     orders.to_csv(output_dir / "order_level_results.csv", index=False)
     monitors.to_csv(output_dir / "queue_time_series.csv", index=False)
     scenario_summary[SUMMARY_COLUMNS].to_csv(output_dir / "scenario_summary.csv", index=False)
     fleet_summary[SUMMARY_COLUMNS].to_csv(output_dir / "fleet_size_sweep.csv", index=False)
     demand_summary[SUMMARY_COLUMNS].to_csv(output_dir / "demand_stress_test.csv", index=False)
+    policy_summary[SUMMARY_COLUMNS].to_csv(output_dir / "dispatch_policy_comparison.csv", index=False)
+    historical_kpis.to_csv(output_dir / "synthetic_historical_kpis.csv", index=False)
+    validation_error.to_csv(output_dir / "historical_kpi_validation_error.csv", index=False)
 
     save_line_chart(
         fleet_summary,
@@ -210,6 +248,15 @@ def run_experiment_suite(output_dir: Path = REPORTS_DIR, replications: int = 5) 
         y_label="Share of completed orders meeting SLA",
         output_path=figures_dir / "sla_attainment_by_scenario.svg",
     )
+    save_bar_chart(
+        policy_summary,
+        x_col="scenario_id",
+        y_col="avg_cycle_time_minutes",
+        title="Dispatching policy comparison by average cycle time",
+        x_label="Assignment policy scenario",
+        y_label="Average cycle time minutes",
+        output_path=figures_dir / "dispatch_policy_comparison.svg",
+    )
     save_queue_chart(monitors, figures_dir / "queue_length_time_series.svg")
 
     return {
@@ -218,6 +265,9 @@ def run_experiment_suite(output_dir: Path = REPORTS_DIR, replications: int = 5) 
         "scenario_summary": scenario_summary,
         "fleet_summary": fleet_summary,
         "demand_summary": demand_summary,
+        "policy_summary": policy_summary,
+        "historical_kpis": historical_kpis,
+        "validation_error": validation_error,
     }
 
 
