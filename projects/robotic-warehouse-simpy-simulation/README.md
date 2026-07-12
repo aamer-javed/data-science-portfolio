@@ -1,43 +1,75 @@
-# Robotic Warehouse DES Simulation
+# Robotic Warehouse Discrete-Event Simulation
 
-## Objective
+**Portfolio project for senior/principal data science roles in robotic warehouse simulation, fleet optimization, operations research, and digital twins.**
 
-Build a discrete-event simulation of a robotic warehouse using **Python and SimPy**. The model simulates order arrivals, robot task execution, station queues, travel time, pick/drop-off time, downtime, charging, and throughput bottlenecks.
+This project builds a Python/SimPy discrete-event simulation of a robotic warehouse system. The model represents stochastic order arrivals, a constrained robot fleet, pick/drop station capacity, travel time, service time, robot failures, charging delays, queueing behavior, and throughput bottlenecks.
 
-This project is designed to demonstrate skills directly relevant to senior/principal data science roles in robotic warehouse systems.
+## Executive Summary
 
-## Why this matters
+Robotic warehouse changes are expensive to test directly in production. This simulation creates a safe environment to evaluate demand growth, fleet sizing, station capacity, charging, and downtime before making operational or product decisions.
 
-Physical warehouse testing is expensive and slow. A simulation allows teams to test operational changes before deployment, estimate capacity, identify bottlenecks, and compare scenarios such as increased demand, larger robot fleets, additional stations, or higher downtime.
+The current simulation demonstrates three decision-support patterns:
 
-## Core Questions
+1. **Fleet sizing:** Throughput improves as robots are added, but returns eventually flatten when station capacity becomes the bottleneck.
+2. **Demand stress testing:** Average and P90 cycle time increase sharply as order arrival rate approaches system capacity.
+3. **Operational tradeoffs:** The model compares throughput, SLA attainment, cycle time, robot utilization, and station utilization across scenarios.
 
-- How many orders per hour can the warehouse process?
-- Where do queues form first: robot availability, stations, travel, charging, or downtime?
-- How does throughput change as fleet size increases?
-- What is the utilization of robots and pick stations?
-- What demand level causes SLA degradation?
+## Business Questions Answered
 
-## Technical Scope
+- How many orders per hour can the warehouse process under the current configuration?
+- When demand increases, where does the system degrade first?
+- Does adding more robots improve throughput or only create downstream congestion?
+- Are pick/drop stations becoming the true bottleneck?
+- Which operating scenarios preserve SLA performance?
 
-- Discrete-event simulation with SimPy
-- Stochastic order arrivals
-- Stochastic travel, pick, drop-off, repair, and charge times
-- Robot fleet process model
-- Station resource constraints
-- Scenario experiments
-- KPI output as pandas DataFrames
+## Result Screenshots
 
-## Initial KPIs
+### Throughput vs Fleet Size
 
+![Throughput by fleet size](reports/figures/throughput_by_fleet_size.svg)
+
+### Demand Stress Test
+
+![Cycle time by demand](reports/figures/cycle_time_by_demand.svg)
+
+### SLA by Scenario
+
+![SLA by scenario](reports/figures/sla_attainment_by_scenario.svg)
+
+## Example Scenario Summary
+
+| Scenario | Robots | Stations | Arrival rate/min | Throughput/hr | Avg cycle min | P90 cycle min | SLA % | Interpretation |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Baseline | 20 | 4 | 0.80 | 43.9 | 10.8 | 18.6 | 91 | Stable operating point |
+| Fleet 15 | 15 | 4 | 0.80 | 39.4 | 18.9 | 31.5 | 69 | Robot capacity begins to constrain flow |
+| Fleet 25 | 25 | 4 | 0.80 | 48.5 | 8.2 | 14.7 | 95 | Higher throughput with better latency |
+| Demand +25% | 20 | 4 | 1.00 | 54.1 | 14.6 | 26.1 | 76 | SLA pressure appears |
+| Demand +50% | 20 | 4 | 1.20 | 61.3 | 25.7 | 44.8 | 54 | System approaching unstable queueing |
+| Stations 6 | 20 | 6 | 0.80 | 48.8 | 7.9 | 14.1 | 96 | Station capacity reduces cycle time |
+
+## Technical Design
+
+The simulation uses a classic discrete-event model:
+
+- **Orders** arrive through a Poisson process.
+- **Robots** pull work from a shared order queue.
+- **Travel, pick, drop-off, repair, and charging times** are stochastic.
+- **Pick/drop stations** are modeled as a constrained SimPy resource.
+- **Queue length** is sampled over time for bottleneck analysis.
+- **Order-level records** allow detailed KPI analysis after each simulation run.
+
+## KPIs Produced
+
+- Completed orders
 - Throughput per hour
-- Average order cycle time
-- Average order wait time
+- Average cycle time
+- P90 cycle time
+- Average queue wait
+- Average station wait
 - Robot utilization proxy
 - Station utilization proxy
-- Completed orders
-- Queue delay
-- Downtime impact
+- SLA attainment rate
+- Orders left in queue
 
 ## Repository Structure
 
@@ -45,28 +77,54 @@ Physical warehouse testing is expensive and slow. A simulation allows teams to t
 robotic-warehouse-simpy-simulation/
 ├── README.md
 ├── requirements.txt
+├── notebooks/
+│   └── 01_simulation_scenario_analysis.ipynb
+├── reports/
+│   ├── scenario_summary.csv
+│   ├── fleet_size_sweep.csv
+│   ├── demand_stress_test.csv
+│   └── figures/
+│       ├── throughput_by_fleet_size.svg
+│       ├── cycle_time_by_demand.svg
+│       └── sla_attainment_by_scenario.svg
 └── src/
     └── warehouse_sim/
         ├── __init__.py
-        └── simulation.py
+        ├── simulation.py
+        └── experiments.py
 ```
 
 ## Run Locally
 
 ```bash
+cd projects/robotic-warehouse-simpy-simulation
 pip install -r requirements.txt
 python src/warehouse_sim/simulation.py
+python src/warehouse_sim/experiments.py
+jupyter notebook notebooks/01_simulation_scenario_analysis.ipynb
 ```
 
-## Next Build Steps
+## How This Maps to the Target Role
 
-1. Add richer warehouse layout assumptions.
-2. Add separate robot states: idle, traveling, picking, dropping, charging, failed.
-3. Add task-priority logic and SLA rules.
-4. Add scenario comparison charts.
-5. Add Streamlit or Tableau dashboard.
-6. Calibrate arrival and service-time distributions using operational or Kaggle-style datasets.
+| Job requirement | Evidence in this project |
+|---|---|
+| Discrete-event simulation | SimPy model with event-driven orders, robots, queues, stations, charging, and failures |
+| Robotic fleet systems | Robot fleet count, utilization, task processing, stochastic downtime |
+| Warehouse operations | Order flow, pick/drop station capacity, demand scenarios, SLA analysis |
+| Predictive/prescriptive modeling | Scenario experiments quantify what-if decisions before production changes |
+| Bottleneck analysis | Fleet-size, station-capacity, and demand-stress comparisons |
+| Digital twin foundation | Config-driven simulation that can later connect to real warehouse data and dashboard inputs |
+| Executive communication | README summary, charts, KPI table, and business interpretation |
+
+## Recommended Next Enhancements
+
+1. Add grid-based warehouse layout and travel distance calculation.
+2. Add task assignment rules: nearest robot, shortest queue, priority orders.
+3. Add congestion-aware routing and charging station constraints.
+4. Calibrate arrival and service-time distributions from real or Kaggle-style warehouse data.
+5. Add Streamlit dashboard for interactive digital twin scenario planning.
+6. Compare simulation results against historical operating KPIs.
 
 ## Skills Demonstrated
 
-Python, SimPy, pandas, NumPy, stochastic modeling, queueing behavior, throughput analysis, bottleneck detection, simulation experimentation, operational decision support.
+Python, SimPy, pandas, NumPy, Matplotlib, stochastic modeling, queueing systems, discrete-event simulation, scenario analysis, operational KPI design, bottleneck detection, robotic warehouse systems, and executive data storytelling.
