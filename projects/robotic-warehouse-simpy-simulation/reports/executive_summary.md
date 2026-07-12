@@ -2,28 +2,72 @@
 
 ## Objective
 
-Build a reproducible discrete-event simulation to evaluate how robotic warehouse throughput, latency, SLA attainment, robot utilization, and station utilization change under different operating assumptions.
+Build a reproducible, public-safe discrete-event simulation that evaluates how robotic warehouse throughput, latency, SLA attainment, robot utilization, and station utilization respond to changes in demand, fleet size, station capacity, failures, and charging behavior.
 
-## Key Findings
+## Business Context
 
-1. **Fleet growth has diminishing returns.** Throughput improves as robots increase from 10 to 25, but gains flatten after that because pick/drop stations become the likely constraint.
-2. **Demand growth creates nonlinear latency risk.** A 25% demand increase creates visible SLA pressure. A 50% demand increase materially increases queue wait and P90 cycle time.
-3. **Station capacity can outperform raw fleet expansion.** Adding stations lowers cycle time and improves SLA attainment when the system is no longer robot-limited.
-4. **Tail latency matters.** P90 cycle time grows faster than average cycle time, which means the warehouse may look acceptable on averages while a significant share of orders misses SLA.
+In robotic warehouse systems, physical testing is expensive and slow. A simulation helps evaluate system changes before rollout and gives stakeholders an evidence-based way to compare operating scenarios.
 
-## Recommended Action
+This model is designed for scenario analysis, not for claiming production accuracy. All parameters are synthetic and documented.
 
-Use this simulation as a first-stage digital twin prototype. The next version should be calibrated with historical order arrival, robot travel, pick time, charging, and downtime data. After calibration, the model can support capacity planning, what-if scenario testing, and pre-production validation of operational changes.
+## Current Scenario Set
 
-## Business Value
+| Scenario | Question |
+|---|---|
+| Baseline | What is the reference operating point? |
+| Fewer robots | How sensitive is throughput to robot capacity? |
+| More robots | Does additional fleet capacity still improve performance? |
+| Demand +25% | When does moderate demand growth pressure SLA? |
+| Demand +50% | How does the system behave near stress conditions? |
+| More stations | Does station capacity reduce queueing and cycle time? |
+| Higher failure rate | How much does reliability affect throughput and latency? |
 
-A model like this reduces reliance on expensive physical testing. It can help operations and robotics teams evaluate changes before production deployment, quantify bottlenecks, and prioritize investments in robots, stations, charging, routing, or staffing.
+## Key KPIs
 
-## Next Build Steps
+| KPI | Why it matters |
+|---|---|
+| Throughput per hour | Measures completed work rate |
+| Average and P90 cycle time | Shows customer/service latency and tail risk |
+| Queue wait | Indicates robot/task assignment pressure |
+| Station wait | Indicates shared station bottleneck pressure |
+| Robot utilization | Indicates whether the fleet is saturated or oversized |
+| Station utilization | Indicates whether stations are saturated |
+| SLA attainment | Translates simulation output into operational service risk |
 
-- Add grid-based layout and path planning.
-- Add nearest-robot and congestion-aware task assignment.
-- Add charging station constraints.
-- Add calibration against real warehouse operational data.
-- Build a Streamlit or Tableau scenario planner.
-- Add validation metrics comparing simulated KPIs to observed KPIs.
+## Interpretation Pattern
+
+The expected analytical pattern is not simply "more robots are better." The useful result is to identify the point where adding robots no longer creates proportional throughput improvement because another constrained resource dominates.
+
+A realistic recommendation should combine:
+
+1. Fleet sizing
+2. Station capacity
+3. Reliability improvement
+4. Charging policy
+5. Dispatch/routing policy
+6. Demand forecast
+
+## Example Executive Takeaway
+
+The model is structured to support a recommendation like:
+
+> Under baseline assumptions, the system processes work reliably while queues remain controlled. Under demand stress, queue wait and P90 cycle time increase faster than average throughput, which suggests the next improvement should not be evaluated only by completed orders per hour. A combined scenario of additional fleet capacity, station capacity, and reliability improvement should be evaluated before production rollout.
+
+## Controls Added
+
+The project now includes professional controls expected in a serious simulation portfolio:
+
+- Typed configuration objects
+- Event-level records
+- Queue monitoring
+- Scenario replications
+- Deterministic seeds
+- Unit tests
+- CI workflow
+- Model design documentation
+- Validation plan
+- Experiment protocol
+
+## Limitations
+
+The model does not yet include layout-aware routing, path conflicts, dynamic dispatch policies, charger-resource constraints, SKU inventory state, human labor constraints, or calibration from real telemetry. Those are listed as production upgrade paths rather than hidden assumptions.
