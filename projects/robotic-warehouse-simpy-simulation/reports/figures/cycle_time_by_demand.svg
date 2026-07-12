@@ -1,24 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-label="Cycle time by demand chart">
-  <rect width="960" height="560" fill="#ffffff"/>
-  <text x="60" y="55" font-family="Arial" font-size="26" font-weight="700" fill="#111827">Cycle time rises quickly near capacity</text>
-  <text x="60" y="88" font-family="Arial" font-size="15" fill="#4b5563">Demand stress test with 20 robots and 4 stations. P90 latency exposes tail-risk before averages do.</text>
-  <line x1="95" y1="450" x2="890" y2="450" stroke="#374151" stroke-width="1.5"/>
-  <line x1="95" y1="125" x2="95" y2="450" stroke="#374151" stroke-width="1.5"/>
+  <rect width="960" height="560" fill="white"/>
+  <text x="64" y="54" font-family="Arial" font-size="24" font-weight="700" fill="#111827">Cycle time rises nonlinearly as demand approaches capacity</text>
+  <text x="64" y="84" font-family="Arial" font-size="14" fill="#4b5563">Average and P90 cycle time under increasing synthetic order arrival rates.</text>
+  <line x1="90" y1="460" x2="890" y2="460" stroke="#374151"/>
+  <line x1="90" y1="120" x2="90" y2="460" stroke="#374151"/>
   <g font-family="Arial" font-size="12" fill="#6b7280">
-    <text x="62" y="454">0</text><text x="55" y="408">10</text><text x="55" y="362">20</text><text x="55" y="316">30</text><text x="55" y="270">40</text><text x="55" y="224">50</text><text x="55" y="178">60</text><text x="55" y="132">70</text>
-    <line x1="95" y1="404" x2="890" y2="404" stroke="#e5e7eb"/><line x1="95" y1="358" x2="890" y2="358" stroke="#e5e7eb"/><line x1="95" y1="312" x2="890" y2="312" stroke="#e5e7eb"/><line x1="95" y1="266" x2="890" y2="266" stroke="#e5e7eb"/><line x1="95" y1="220" x2="890" y2="220" stroke="#e5e7eb"/><line x1="95" y1="174" x2="890" y2="174" stroke="#e5e7eb"/><line x1="95" y1="128" x2="890" y2="128" stroke="#e5e7eb"/>
+    <text x="58" y="464">0</text><text x="52" y="396">30</text><text x="52" y="328">60</text><text x="52" y="260">90</text><text x="45" y="192">120</text><text x="45" y="124">150</text>
+    <line x1="90" y1="392" x2="890" y2="392" stroke="#e5e7eb"/><line x1="90" y1="324" x2="890" y2="324" stroke="#e5e7eb"/><line x1="90" y1="256" x2="890" y2="256" stroke="#e5e7eb"/><line x1="90" y1="188" x2="890" y2="188" stroke="#e5e7eb"/><line x1="90" y1="120" x2="890" y2="120" stroke="#e5e7eb"/>
+    <text x="120" y="488">0.65</text><text x="300" y="488">0.85</text><text x="480" y="488">1.05</text><text x="660" y="488">1.25</text><text x="840" y="488">1.45</text>
   </g>
-  <polyline points="160,410 310,400 460,383 610,332 760,250" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="160,381 310,364 460,330 610,244 760,123" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <g fill="#2563eb" stroke="#ffffff" stroke-width="3"><circle cx="160" cy="410" r="7"/><circle cx="310" cy="400" r="7"/><circle cx="460" cy="383" r="7"/><circle cx="610" cy="332" r="7"/><circle cx="760" cy="250" r="7"/></g>
-  <g fill="#dc2626" stroke="#ffffff" stroke-width="3"><circle cx="160" cy="381" r="7"/><circle cx="310" cy="364" r="7"/><circle cx="460" cy="330" r="7"/><circle cx="610" cy="244" r="7"/><circle cx="760" cy="123" r="7"/></g>
-  <g font-family="Arial" font-size="13" fill="#111827" text-anchor="middle"><text x="160" y="472">0.70</text><text x="310" y="472">0.80</text><text x="460" y="472">1.00</text><text x="610" y="472">1.20</text><text x="760" y="472">1.40</text></g>
-  <text x="390" y="520" font-family="Arial" font-size="15" fill="#374151">Order arrival rate per minute</text>
-  <text x="-340" y="28" transform="rotate(-90)" font-family="Arial" font-size="15" fill="#374151">Cycle time minutes</text>
-  <rect x="620" y="145" width="230" height="65" rx="10" fill="#ffffff" stroke="#d1d5db"/>
-  <line x1="640" y1="165" x2="682" y2="165" stroke="#2563eb" stroke-width="4"/><text x="695" y="170" font-family="Arial" font-size="13" fill="#111827">Average cycle time</text>
-  <line x1="640" y1="190" x2="682" y2="190" stroke="#dc2626" stroke-width="4"/><text x="695" y="195" font-family="Arial" font-size="13" fill="#111827">P90 cycle time</text>
-  <rect x="560" y="385" width="300" height="55" rx="10" fill="#fff7ed" stroke="#fed7aa"/>
-  <text x="580" y="410" font-family="Arial" font-size="14" font-weight="700" fill="#c2410c">Executive readout</text>
-  <text x="580" y="430" font-family="Arial" font-size="13" fill="#7c2d12">Demand growth drives tail latency faster than average latency.</text>
+  <polyline fill="none" stroke="#2563eb" stroke-width="3" points="140,441 320,430 500,397 680,343 860,271"/>
+  <polyline fill="none" stroke="#dc2626" stroke-width="3" points="140,424 320,398 500,342 680,259 860,153"/>
+  <g fill="#2563eb"><circle cx="140" cy="441" r="5"/><circle cx="320" cy="430" r="5"/><circle cx="500" cy="397" r="5"/><circle cx="680" cy="343" r="5"/><circle cx="860" cy="271" r="5"/></g>
+  <g fill="#dc2626"><circle cx="140" cy="424" r="5"/><circle cx="320" cy="398" r="5"/><circle cx="500" cy="342" r="5"/><circle cx="680" cy="259" r="5"/><circle cx="860" cy="153" r="5"/></g>
+  <rect x="665" y="110" width="210" height="58" fill="white" stroke="#d1d5db"/>
+  <line x1="680" y1="130" x2="725" y2="130" stroke="#2563eb" stroke-width="3"/><text x="735" y="135" font-family="Arial" font-size="13" fill="#111827">Average cycle time</text>
+  <line x1="680" y1="152" x2="725" y2="152" stroke="#dc2626" stroke-width="3"/><text x="735" y="157" font-family="Arial" font-size="13" fill="#111827">P90 cycle time</text>
+  <text x="340" y="525" font-family="Arial" font-size="14" fill="#374151">Order arrival rate per minute</text>
+  <text x="18" y="330" transform="rotate(-90 18 330)" font-family="Arial" font-size="14" fill="#374151">Cycle time minutes</text>
 </svg>

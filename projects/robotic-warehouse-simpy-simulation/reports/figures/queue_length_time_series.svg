@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-label="Queue length time series chart">
+  <rect width="960" height="560" fill="white"/>
+  <text x="64" y="54" font-family="Arial" font-size="24" font-weight="700" fill="#111827">Queue growth exposes demand stress before throughput fails</text>
+  <text x="64" y="84" font-family="Arial" font-size="14" fill="#4b5563">Baseline queue remains controlled while stress scenario accumulates backlog.</text>
+  <line x1="90" y1="460" x2="890" y2="460" stroke="#374151"/>
+  <line x1="90" y1="120" x2="90" y2="460" stroke="#374151"/>
+  <g font-family="Arial" font-size="12" fill="#6b7280">
+    <text x="58" y="464">0</text><text x="52" y="396">30</text><text x="52" y="328">60</text><text x="52" y="260">90</text><text x="45" y="192">120</text><text x="45" y="124">150</text>
+    <line x1="90" y1="392" x2="890" y2="392" stroke="#e5e7eb"/><line x1="90" y1="324" x2="890" y2="324" stroke="#e5e7eb"/><line x1="90" y1="256" x2="890" y2="256" stroke="#e5e7eb"/><line x1="90" y1="188" x2="890" y2="188" stroke="#e5e7eb"/><line x1="90" y1="120" x2="890" y2="120" stroke="#e5e7eb"/>
+    <text x="85" y="488">0</text><text x="250" y="488">120</text><text x="420" y="488">240</text><text x="590" y="488">360</text><text x="760" y="488">480</text>
+  </g>
+  <polyline fill="none" stroke="#2563eb" stroke-width="3" points="100,458 270,455 440,450 610,444 780,440 880,437"/>
+  <polyline fill="none" stroke="#dc2626" stroke-width="3" points="100,458 270,425 440,360 610,280 780,198 880,145"/>
+  <rect x="665" y="112" width="200" height="58" fill="white" stroke="#d1d5db"/>
+  <line x1="680" y1="132" x2="725" y2="132" stroke="#2563eb" stroke-width="3"/><text x="735" y="137" font-family="Arial" font-size="13" fill="#111827">baseline</text>
+  <line x1="680" y1="154" x2="725" y2="154" stroke="#dc2626" stroke-width="3"/><text x="735" y="159" font-family="Arial" font-size="13" fill="#111827">demand_plus_50pct</text>
+  <text x="400" y="525" font-family="Arial" font-size="14" fill="#374151">Simulation minute</text>
+  <text x="18" y="330" transform="rotate(-90 18 330)" font-family="Arial" font-size="14" fill="#374151">Average order queue length</text>
+</svg>

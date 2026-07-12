@@ -1,0 +1,4 @@
+scenario_id,metric,simulated,historical,error,absolute_error
+baseline,throughput_per_hour,50.2,49.2,1.0,1.0
+baseline,avg_cycle_time_minutes,11.8,12.1,-0.3,0.3
+baseline,sla_attainment_rate,0.92,0.91,0.01,0.01

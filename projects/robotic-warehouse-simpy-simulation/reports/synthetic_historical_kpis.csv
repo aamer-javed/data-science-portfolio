@@ -1,0 +1,2 @@
+scenario_id,throughput_per_hour,avg_cycle_time_minutes,sla_attainment_rate
+baseline,49.2,12.1,0.91
