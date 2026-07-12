@@ -28,7 +28,7 @@ def test_apply_calibration_returns_new_config():
     calibrated = apply_calibration(WarehouseConfig(), events)
 
     assert calibrated.scenario_id == "calibrated"
-    assert calibrated.mean_travel_time_minutes == 2
+    assert calibrated.travel_speed_cells_per_minute == 21.0
 
 
 def test_compare_to_historical_kpis_returns_error_table():
