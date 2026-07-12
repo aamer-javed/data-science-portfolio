@@ -7,6 +7,8 @@ from typing import Any
 
 import pandas as pd
 
+Location = tuple[int, int]
+
 
 @dataclass(frozen=True)
 class Order:
@@ -14,6 +16,18 @@ class Order:
 
     order_id: int
     created_at: float
+    storage_location: Location
+    priority: bool
+    due_by: float
+
+
+@dataclass
+class RobotState:
+    """Mutable robot state tracked by the simulation engine."""
+
+    robot_id: int
+    location: Location
+    tasks_since_charge: int = 0
 
 
 @dataclass(frozen=True)
@@ -34,14 +48,23 @@ class OrderRecord:
     completed_at: float
     queue_wait_minutes: float
     station_wait_minutes: float
+    charging_wait_minutes: float
     travel_time_minutes: float
     pick_time_minutes: float
     dropoff_time_minutes: float
     repair_time_minutes: float
     charge_time_minutes: float
     cycle_time_minutes: float
+    travel_distance_cells: int
+    storage_x: int
+    storage_y: int
+    station_x: int
+    station_y: int
+    priority: bool
+    due_by: float
     met_sla: bool
     robot_failed: bool
+    assignment_policy: str
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -49,7 +72,7 @@ class OrderRecord:
 
 @dataclass(frozen=True)
 class MonitorRecord:
-    """Periodic monitoring snapshot for queue and station state."""
+    """Periodic monitoring snapshot for queue, station, and charger state."""
 
     scenario_id: str
     replication: int
@@ -57,6 +80,8 @@ class MonitorRecord:
     queue_length: int
     station_queue_length: int
     station_users: int
+    charger_queue_length: int
+    charger_users: int
     completed_orders: int
 
     def to_dict(self) -> dict[str, Any]:
