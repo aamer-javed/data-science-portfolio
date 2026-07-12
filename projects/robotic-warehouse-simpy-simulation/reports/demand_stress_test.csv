@@ -1,6 +1,6 @@
-arrival_rate_per_minute,robot_count,station_count,throughput_per_hour,avg_cycle_time_minutes,p90_cycle_time_minutes,avg_queue_wait_minutes,robot_utilization_proxy,station_utilization_proxy,sla_attainment_rate
-0.70,20,4,39.2,8.6,14.9,0.1,0.34,0.39,0.96
-0.80,20,4,43.9,10.8,18.6,0.3,0.41,0.45,0.91
-1.00,20,4,54.1,14.6,26.1,3.2,0.51,0.58,0.76
-1.20,20,4,61.3,25.7,44.8,12.4,0.60,0.69,0.54
-1.40,20,4,64.4,43.5,71.0,28.9,0.66,0.78,0.31
+scenario_id,replications,robot_count,station_count,arrival_rate_per_minute,generated_orders,completed_orders,orders_left_in_queue,throughput_per_hour,avg_cycle_time_minutes,p50_cycle_time_minutes,p90_cycle_time_minutes,avg_queue_wait_minutes,avg_station_wait_minutes,robot_utilization,station_utilization,sla_attainment_rate,failure_rate,charge_time_total_minutes,bottleneck_classification
+demand_0_65,5,24,4,0.65,311.2,308.8,1.6,38.60,8.41,6.82,15.92,0.16,0.37,0.30,0.44,0.97,0.014,195.2,balanced / stable
+demand_0_85,5,24,4,0.85,408.2,397.4,8.2,49.68,13.42,10.91,27.44,2.71,0.83,0.47,0.56,0.86,0.015,286.4,balanced / stable
+demand_1_05,5,24,4,1.05,503.6,455.2,45.3,56.90,27.64,25.21,52.03,15.63,1.29,0.68,0.64,0.57,0.015,354.1,robot constrained
+demand_1_25,5,24,4,1.25,599.1,492.6,101.8,61.58,51.72,50.43,88.76,36.42,1.94,0.78,0.69,0.32,0.016,408.8,robot constrained
+demand_1_45,5,24,4,1.45,693.7,510.4,178.1,63.80,83.54,82.31,135.49,66.18,2.77,0.84,0.71,0.12,0.016,440.3,robot constrained
