@@ -25,7 +25,7 @@ FIGURES_DIR = REPORTS_DIR / "figures"
 
 SUMMARY_COLUMNS = [
     "scenario_id",
-    "replication",
+    "replications",
     "robot_count",
     "station_count",
     "arrival_rate_per_minute",
@@ -87,12 +87,15 @@ def aggregate_replications(summary: pd.DataFrame) -> pd.DataFrame:
     numeric_cols = [col for col in numeric_cols if col != "replication"]
     grouped = summary.groupby("scenario_id", as_index=False)[numeric_cols].mean()
 
+    replications = summary.groupby("scenario_id").size().rename("replications").reset_index()
     bottlenecks = (
         summary.groupby("scenario_id")["bottleneck_classification"]
         .agg(lambda values: values.mode().iloc[0] if not values.mode().empty else values.iloc[0])
         .reset_index()
     )
-    return grouped.merge(bottlenecks, on="scenario_id", how="left")
+    return grouped.merge(replications, on="scenario_id", how="left").merge(
+        bottlenecks, on="scenario_id", how="left"
+    )
 
 
 def save_line_chart(
