@@ -1,6 +1,11 @@
+-e .
 simpy>=4.1.1
 numpy>=1.26.0
 pandas>=2.2.0
 matplotlib>=3.8.0
-pytest>=8.0.0
+pytest>=8.2.0
+ruff>=0.5.0
 jupyter>=1.0.0
+ipykernel>=6.29.0
+nbformat>=5.10.0
+nbconvert>=7.16.0
