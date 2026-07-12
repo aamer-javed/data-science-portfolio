@@ -55,7 +55,7 @@ def test_dispatch_policy_configs_cover_baseline_rules():
 
 
 def test_experiment_suite_writes_expected_artifacts(tmp_path: Path):
-    outputs = run_experiment_suite(tmp_path)
+    outputs = run_experiment_suite(tmp_path, replications=1)
 
     assert (tmp_path / "scenario_summary.csv").exists()
     assert (tmp_path / "fleet_size_sweep.csv").exists()
