@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, replace
 from typing import Any, Literal
 
-AssignmentPolicy = Literal["fifo", "nearest_station", "priority_first"]
+AssignmentPolicy = Literal["fifo", "priority_fifo", "nearest_robot", "shortest_queue_priority"]
 
 
 @dataclass(frozen=True)
@@ -34,12 +34,12 @@ class WarehouseConfig:
     charging_station_count: int = 4
     order_arrival_rate_per_minute: float = 0.85
 
-    # Layout and movement.
+    # Layout, routing, and dispatching.
     warehouse_width: int = 40
     warehouse_height: int = 24
     travel_speed_cells_per_minute: float = 12.0
     congestion_factor: float = 0.08
-    assignment_policy: AssignmentPolicy = "priority_first"
+    assignment_policy: AssignmentPolicy = "shortest_queue_priority"
 
     # Process times.
     mean_pick_time_minutes: float = 2.2
@@ -77,8 +77,10 @@ class WarehouseConfig:
             raise ValueError("travel_speed_cells_per_minute must be positive.")
         if self.congestion_factor < 0:
             raise ValueError("congestion_factor cannot be negative.")
-        if self.assignment_policy not in {"fifo", "nearest_station", "priority_first"}:
-            raise ValueError("assignment_policy must be fifo, nearest_station, or priority_first.")
+        if self.assignment_policy not in {"fifo", "priority_fifo", "nearest_robot", "shortest_queue_priority"}:
+            raise ValueError(
+                "assignment_policy must be fifo, priority_fifo, nearest_robot, or shortest_queue_priority."
+            )
         if self.mean_pick_time_minutes < 0:
             raise ValueError("mean_pick_time_minutes cannot be negative.")
         if self.mean_dropoff_time_minutes < 0:
