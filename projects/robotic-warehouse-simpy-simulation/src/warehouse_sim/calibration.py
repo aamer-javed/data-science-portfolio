@@ -26,10 +26,18 @@ class CalibrationReport:
     failure_probability_per_task: float
     mean_repair_time_minutes: float
 
-    def to_config_overrides(self) -> dict[str, float]:
+    def to_config_overrides(self, typical_travel_distance_cells: float = 42.0) -> dict[str, float]:
+        """Convert calibrated estimates into compatible WarehouseConfig overrides.
+
+        The simulation uses grid distance and travel speed rather than a fixed
+        mean travel time. To bridge event-log calibration with the grid model,
+        this method converts mean observed travel time into an approximate travel
+        speed using a public-safe typical trip distance.
+        """
+        travel_speed = typical_travel_distance_cells / max(self.mean_travel_time_minutes, 0.1)
         return {
             "order_arrival_rate_per_minute": self.arrival_rate_per_minute,
-            "mean_travel_time_minutes": self.mean_travel_time_minutes,
+            "travel_speed_cells_per_minute": travel_speed,
             "mean_pick_time_minutes": self.mean_pick_time_minutes,
             "mean_dropoff_time_minutes": self.mean_dropoff_time_minutes,
             "failure_probability_per_task": self.failure_probability_per_task,
@@ -74,9 +82,10 @@ def calibrate_from_event_log(events: pd.DataFrame, base_config: WarehouseConfig 
     if "robot_failed" in events.columns and not events.empty:
         failure_rate = float(pd.Series(events["robot_failed"]).astype(bool).mean())
 
+    fallback_travel_time = 42.0 / base.travel_speed_cells_per_minute
     return CalibrationReport(
         arrival_rate_per_minute=estimate_arrival_rate(events),
-        mean_travel_time_minutes=_positive_mean(events, "travel_time_minutes", base.mean_travel_time_minutes),
+        mean_travel_time_minutes=_positive_mean(events, "travel_time_minutes", fallback_travel_time),
         mean_pick_time_minutes=_positive_mean(events, "pick_time_minutes", base.mean_pick_time_minutes),
         mean_dropoff_time_minutes=_positive_mean(events, "dropoff_time_minutes", base.mean_dropoff_time_minutes),
         failure_probability_per_task=failure_rate,
